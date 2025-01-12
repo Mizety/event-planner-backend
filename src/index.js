@@ -4,7 +4,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import authRoutes from "./routes/auth.js";
 import eventRoutes from "./routes/events.js";
-import { verifyToken } from "./middleware/auth.js";
+import imageRoutes from "./routes/image.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -25,13 +25,14 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
+app.use("/api/images", imageRoutes);
 
 io.on("connection", (socket) => {
   socket.on("joinEvent", (eventId) => {
     socket.join(`event:${eventId}`);
   });
 });
-
+app.set("io", io);
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
