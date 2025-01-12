@@ -5,6 +5,7 @@ import { z } from "zod";
 import prisma from "../lib/prisma.js";
 import { verifyToken } from "../middleware/auth.js";
 import rateLimit from "express-rate-limit";
+import validateRequest from "../lib/validate.js";
 
 const router = express.Router();
 
@@ -37,25 +38,6 @@ const authLimiter = rateLimit({
   max: 15, // 15 attempts
   message: { message: "Too many login attempts. Please try again later." },
 });
-
-// Error handler middleware
-const validateRequest = (schema) => async (req, res, next) => {
-  try {
-    await schema.parseAsync(req.body);
-    next();
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({
-        message: "Validation failed",
-        errors: error.errors.map((err) => ({
-          field: err.path.join("."),
-          message: err.message,
-        })),
-      });
-    }
-    next(error);
-  }
-};
 
 router.post("/register", validateRequest(userSchema), async (req, res) => {
   try {
