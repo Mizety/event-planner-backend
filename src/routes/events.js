@@ -27,7 +27,7 @@ const eventSchema = z.object({
   coverUrl: z.string().url(),
 });
 
-router.get("/", async (req, res) => {
+router.get("/", async (req, res, next) => {
   try {
     const query = querySchema.parse(req.query);
     const {
@@ -111,7 +111,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req, res, next) => {
   try {
     const event = await prisma.event.findUnique({
       where: { id: req.params.id },
